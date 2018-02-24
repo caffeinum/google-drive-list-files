@@ -45,8 +45,16 @@ function authorize(credentials, callback) {
       getNewToken(oauth2Client, callback);
     } else {
       oauth2Client.credentials = JSON.parse(token);
+      oauth2Client.refreshAccessToken(function(err, tokens) {
+        if (err) { console.error(err) }
 
-      callback(oauth2Client);
+        oauth2Client.credentials = tokens;
+        // console.log('tokens!', tokens)
+        // your access_token is now refreshed and stored in oauth2Client
+        // store these new tokens in a safe place (e.g. database)
+        callback(oauth2Client);
+      });
+
     }
   });
 }
