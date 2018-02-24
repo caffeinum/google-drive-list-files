@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var axios = require('axios')
 var google = require('./google')
 
@@ -17,8 +19,21 @@ let output = function (data) {
   // log("\n")
 }
 
+let dirID = process.argv[3]
+let index = parseInt(process.argv[2])
+
+if ( !index ) {
+  index = 0
+}
+
+if ( !dirID ) {
+  dirID = "1m8Jp1xSM78VkJDdv0U8Q4rYCS4E_Vll5"
+}
+
+log("Using index", index)
+log("Using dirID", dirID)
+
 google.auth((auth) => {
-  let dirID = "1m8Jp1xSM78VkJDdv0U8Q4rYCS4E_Vll5"
 
   let headers = {
     "Authorization": "Bearer " + auth.credentials.access_token
@@ -29,7 +44,10 @@ google.auth((auth) => {
   files.then( files => {
     log( 'files', files )
 
-    let checkpoint = files[0]
+    let checkpoint = files[ index ]
+    if ( !checkpoint ) {
+      throw new Error('File with index not found: '+index)
+    }
 
     let id = checkpoint["id"]
 
@@ -38,7 +56,10 @@ google.auth((auth) => {
     return id
   })
   .then( output )
-  .catch(error => { console.error("ERROR " + error.response.status + " " + error.response.statusText + "\n" + error.response.config.url) })
+  .catch(error => {
+    if ( !error.response ) return console.error(error)
+    console.error("ERROR " + error.response.status + " " + error.response.statusText + "\n" + error.response.config.url)
+  })
 })
 
 
