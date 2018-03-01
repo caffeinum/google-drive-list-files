@@ -14,9 +14,8 @@ let log = function (...args) {
 }
 
 let output = function (data) {
-  process.stdout.write(data)
+	process.stdout.write(JSON.stringify(data))
   log(data)
-  // log("\n")
 }
 
 let dirID = process.argv[3]
@@ -42,7 +41,8 @@ google.auth((auth) => {
   let files = findFiles(auth, dirID)
 
   files.then( files => {
-    log( 'files', files )
+    log( 'files' )
+		output( files )
 
     let checkpoint = files[ index ]
     if ( !checkpoint ) {
@@ -55,7 +55,8 @@ google.auth((auth) => {
 
     return id
   })
-  .then( output )
+  .then( log('fileid') )
+  .then( log )
   .catch(error => {
     if ( !error.response ) return console.error(error)
     console.error("ERROR " + error.response.status + " " + error.response.statusText + "\n" + error.response.config.url)
